@@ -1,0 +1,11 @@
+flask
+flask_sqlalchemy
+werkzeug
+scikit-learn
+numpy<2.0.0
+joblib
+transformers
+torch==2.1.2+cpu
+flask_login
+Pillow
+gunicorn

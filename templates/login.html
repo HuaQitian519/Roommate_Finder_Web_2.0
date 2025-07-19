@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}登录 - 室友匹配系统{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card p-4">
+      <h2 class="mb-4 text-center">登录</h2>
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label">用户名</label>
+          <input type="text" class="form-control" name="username" required autofocus>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">密码</label>
+          <input type="password" class="form-control" name="password" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">验证码</label>
+          <div class="input-group">
+            <input type="text" class="form-control" name="captcha" placeholder="请输入验证码" required>
+            <span class="input-group-text p-0 bg-white border-0">
+              <img src="{{ url_for('captcha') }}" alt="验证码" style="height:38px;cursor:pointer;" onclick="this.src='{{ url_for('captcha') }}?'+Math.random()" />
+            </span>
+          </div>
+        </div>
+        <div class="d-grid mt-4">
+          <button type="submit" class="btn btn-primary btn-lg">登录</button>
+        </div>
+      </form>
+      <div class="text-center mt-3">
+        <a href="/register">没有账号？立即注册</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

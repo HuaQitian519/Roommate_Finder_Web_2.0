@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}室友匹配系统{% endblock %}</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background: #f8fafc;
+        }
+        .navbar {
+            background: linear-gradient(90deg, #4f8cff 0%, #6fd6ff 100%);
+        }
+        .navbar-brand, .nav-link, .navbar-nav .nav-link.active {
+            color: #fff !important;
+            font-weight: 500;
+        }
+        .container {
+            margin-top: 40px;
+        }
+        .card {
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #4f8cff 0%, #6fd6ff 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #6fd6ff 0%, #4f8cff 100%);
+        }
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 20px;
+                padding: 0 15px;
+            }
+            .navbar-nav {
+                text-align: center;
+                margin-top: 10px;
+            }
+            .nav-item {
+                margin: 5px 0;
+            }
+            .btn-mobile {
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+                padding: 12px;
+                font-size: 16px;
+            }
+            .card {
+                margin-bottom: 20px;
+            }
+        }
+        /* 突出显示注册登录按钮 */
+        .btn-register {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+        .btn-login {
+            background: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">室友匹配系统</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">首页</a></li>
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="/profile">个人信息</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/match">智能匹配</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">登出</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-info mt-3">
+          {% for message in messages %}
+            <div>{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

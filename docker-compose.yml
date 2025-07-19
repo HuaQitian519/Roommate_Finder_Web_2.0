@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  roommate_matcher:
+    image: huaqitian/roommate_matcher:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./database/roommate.db:/app/database/roommate.db
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+    restart: always 

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}用户使用协议 - 室友匹配系统{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">用户使用协议</h3>
+                </div>
+                <div class="card-body">
+                    <div class="agreement-content" style="max-height: 400px; overflow-y: auto;">
+                        <h5>一、服务说明</h5>
+                        <p>室友匹配系统（以下简称"本系统"）是一个为CUC海南同学提供室友匹配服务的公益平台。通过本系统，用户可以发布个人信息，寻找合适的室友。</p>
+                        
+                        <h5>二、信息收集与使用</h5>
+                        <p>1. 本系统会收集您提供的个人信息，包括但不限于：姓名、专业、作息时间、生活习惯、联系方式等。</p>
+                        <p>2. 收集的信息将用于：</p>
+                        <ul>
+                            <li>提供室友匹配服务</li>
+                            <li>改善用户体验</li>
+                            <li>系统安全维护</li>
+                        </ul>
+                        
+                        <h5>三、数据存储与保护</h5>
+                        <p>1. 您的个人信息将安全存储在服务器上，采用行业标准的安全措施进行保护。</p>
+                        <p>2. 数据存储期限：服务完成后，数据将按标准流程在合理时间内销毁。</p>
+                        <p>3. 我们承诺不会将您的个人信息出售、出租或以其他方式提供给第三方，除非：</p>
+                        <ul>
+                            <li>获得您的明确同意</li>
+                            <li>法律法规要求</li>
+                            <li>保护系统安全</li>
+                        </ul>
+                        
+                        <h5>四、用户责任</h5>
+                        <p>1. 您承诺提供的信息真实、准确、完整。</p>
+                        <p>2. 您不得利用本系统进行任何违法或不当活动。</p>
+                        <p>3. 您应妥善保管自己的账号信息，不得将账号提供给他人使用。</p>
+                        
+                        <h5>五、免责声明</h5>
+                        <p>1. 本系统仅提供信息匹配服务，不参与用户之间的具体交流或交易。</p>
+                        <p>2. 用户通过本系统获得的信息的真实性、准确性由信息提供者负责。</p>
+                        <p>3. 因用户提供虚假信息或不当行为造成的任何损失，本系统不承担责任。</p>
+                        <p>4. 本系统不对用户之间的纠纷承担责任。</p>
+                        <p>5. 因不可抗力、技术故障等原因导致的服务中断，本系统不承担责任。</p>
+                        
+                        <h5>六、协议修改</h5>
+                        <p>本协议可能会根据法律法规变化或服务需要而进行修改。修改后的协议将在系统内公布，继续使用本系统即表示您同意修改后的协议。</p>
+                        
+                        <h5>七、联系方式</h5>
+                        <p>如有任何问题或建议，请联系：微信 INNO-ONNI</p>
+                        
+                        <p class="text-muted mt-4">
+                            <small>最后更新时间：2025年7月</small>
+                        </p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="/register" class="btn btn-secondary">返回注册</a>
+                        <a href="/" class="btn btn-primary">返回首页</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.agreement-content {
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+.agreement-content h5 {
+    color: #2c3e50;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+.agreement-content p {
+    margin-bottom: 0.8rem;
+    text-align: justify;
+}
+.agreement-content ul {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+}
+.agreement-content li {
+    margin-bottom: 0.3rem;
+}
+</style>
+{% endblock %} 

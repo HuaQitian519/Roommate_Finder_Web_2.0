@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}智能匹配结果 - 室友匹配系统{% endblock %}
+{% block content %}
+<style>
+.card-gradient-bar {
+  height: 4px;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  background: linear-gradient(90deg, #4f8cff 0%, #ffb86c 50%, #6fd6ff 100%);
+}
+.card-user {
+  transition: box-shadow 0.2s;
+  box-shadow: 0 2px 12px rgba(79,140,255,0.07);
+  border-radius: 1rem;
+}
+.card-user:hover {
+  box-shadow: 0 6px 24px rgba(79,140,255,0.18);
+  transform: translateY(-2px) scale(1.02);
+}
+.badge-major { background: #4f8cff; color: #fff; font-weight: 500; }
+.badge-hobby { background: #ff6cff; color: #fff; font-weight: 500; }
+.text-label { color: #888; font-size: 0.98em; margin-right: 0.5em; }
+.text-main { color: #222; font-weight: 500; }
+.text-wechat { color: #1a7f37; font-weight: 600; font-size: 1.1em; }
+</style>
+<div class="text-center mb-4">
+  <h2 class="fw-bold">🎯 智能匹配结果</h2>
+  <p class="text-muted">以下是与你生活习惯和兴趣最接近的3位同学</p>
+  <form method="get" class="d-flex align-items-center justify-content-center gap-3 mt-2 mb-2">
+    <label class="form-check-label mb-0" style="font-size:1.3em;">
+      <input type="checkbox" class="form-check-input me-2" name="same_major_only" value="yes" {% if request.args.get('same_major_only') == 'yes' %}checked{% endif %}>
+      只显示本专业同学
+    </label>
+    <button type="submit" class="btn btn-outline-primary btn-sm mb-0" style="font-size:1.1em;">筛选</button>
+  </form>
+</div>
+<div class="row justify-content-center g-4">
+  {% for user in matched_users %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card card-user h-100">
+        <div class="card-gradient-bar"></div>
+        <div class="card-body">
+          <h5 class="card-title mb-2 text-main">{{ user.real_name }}</h5>
+          <div class="mb-2"><span class="badge badge-major me-2">专业</span>{{ user.major }}</div>
+          {% if user.mbti %}
+          <div class="mb-2"><span class="badge bg-info text-dark me-2">MBTI</span>{{ user.mbti }}</div>
+          {% endif %}
+          <div class="mb-2"><span class="text-label">作息</span>{{ user.sleep_time }} - {{ user.wake_time }}</div>
+          <div class="mb-2"><span class="text-label">床铺</span>{% if user.bunk_preference in ['上铺','upper'] %}上铺{% elif user.bunk_preference in ['下铺','lower'] %}下铺{% else %}无偏好{% endif %}</div>
+          <div class="mb-2"><span class="text-label">卫生</span>{% if user.cleanliness|int >= 5 %}非常爱干净{% elif user.cleanliness|int >= 3 %}一般{% else %}比较随意{% endif %}（{{ user.cleanliness }}）</div>
+          <div class="mb-2"><span class="text-label">学习</span>{% if user.study_habits %}{{ user.study_habits }}{% else %}无特别偏好{% endif %}</div>
+          <div class="mb-2"><span class="text-label">周末留校</span>{{ user.weekend_stay }}</div>
+          <div class="mb-2"><span class="text-label">集体生活</span>{{ user.group_life }}</div>
+          <div class="mb-2"><span class="badge badge-hobby me-2">爱好</span>{{ user.hobbies }}</div>
+          <div class="mb-2"><span class="text-label">饮食禁忌</span>{{ user.dietary_restrictions }}</div>
+          <div class="mb-2"><span class="text-label">微信</span>
+            <span class="text-wechat" id="wechat-{{ loop.index }}">{{ user.wechat }}</span>
+            <button class="btn btn-outline-secondary btn-sm ms-2" type="button" onclick="navigator.clipboard.writeText('{{ user.wechat }}')">复制</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="col-12 text-center text-muted">暂无匹配结果</div>
+  {% endfor %}
+</div>
+<div class="text-center mt-4">
+  <a href="/match" class="btn btn-primary btn-lg">重新匹配</a>
+  <a href="/" class="btn btn-outline-secondary btn-lg ms-2">返回首页</a>
+</div>
+{% endblock %}
