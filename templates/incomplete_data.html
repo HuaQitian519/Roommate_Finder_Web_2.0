@@ -3,14 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>信息不完整 - 室友匹配系统</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>审核中 - 室友匹配系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>信息不完整</h1>
-        <p>您的信息尚未填写完整，请完善信息以便系统为您寻找匹配的室友。</p>
-        <a href="{{ url_for('modify') }}">点击这里填写信息</a>
+        <div class="review-card">
+            <h1>🔍 账号审核中</h1>
+            <div class="review-alert">
+                <p>{{ message or "您的账号正在审核中，请耐心等待。" }}</p>
+                <ul><li>预计审核时间：15分钟</li></ul>
+                <p>如果在8:00-00:00超过15min未通过审核，请联系微信 INNO-ONNI</p>           
+                <p>审核通过后，您将能够：</p>
+                <ul>
+                    <li>查看其他用户信息</li>
+                    <li>使用智能匹配功能</li>
+                    <li>参与随机匹配</li>
+                </ul>
+            </div>
+            <div class="review-actions">
+                <a href="{{ url_for('index') }}" class="review-btn review-btn-primary">返回首页</a>
+                <a href="{{ url_for('profile') }}" class="review-btn review-btn-secondary">查看我的资料</a>
+            </div>
+        </div>
     </div>
 </body>
 </html>

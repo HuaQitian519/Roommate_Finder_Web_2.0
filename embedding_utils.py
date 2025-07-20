@@ -129,13 +129,26 @@ def find_top3_matches(current_user_dict, current_hobbies, current_user_id, same_
     bert_weight = 0.5
     current_hobbies_emb = get_text_embedding(current_hobbies)
     current_full_emb = np.concatenate([current_vec_weighted[0], bert_weight * current_hobbies_emb])
-    # 过滤掉自己和不合格用户
+    # 过滤掉自己和不合格用户，添加性别过滤
     from models import User
     valid_mask = []
     user_bunks = []
+    current_gender = current_user_dict.get('gender')
+    
+    # 性别值映射
+    gender_mapping = {'male': '男', 'female': '女', '男': '男', '女': '女'}
+    current_gender_normalized = gender_mapping.get(current_gender, current_gender)
+    
     for uid in user_ids:
         user = User.query.get(int(uid))
         if user and user.is_approved and not user.is_banned and int(uid) != int(current_user_id):
+            # 添加性别过滤，只匹配同性别用户
+            user_gender_normalized = gender_mapping.get(user.gender, user.gender)
+            if user_gender_normalized != current_gender_normalized:
+                valid_mask.append(False)
+                user_bunks.append(None)
+                continue
+                
             if same_major_only and current_major and user.major != current_major:
                 valid_mask.append(False)
                 user_bunks.append(None)
@@ -148,6 +161,24 @@ def find_top3_matches(current_user_dict, current_hobbies, current_user_id, same_
     X_valid = X[valid_mask]
     user_ids_valid = user_ids[valid_mask]
     user_bunks_valid = [b for b, v in zip(user_bunks, valid_mask) if v]
+    
+    # 获取用户详细信息用于睡眠时间计算
+    user_details = []
+    for uid in user_ids_valid:
+        user = User.query.get(int(uid))
+        if user:
+            user_details.append({
+                'sleep_time': user.sleep_time,
+                'wake_time': user.wake_time,
+                'bunk_preference': user.bunk_preference
+            })
+        else:
+            user_details.append({
+                'sleep_time': '',
+                'wake_time': '',
+                'bunk_preference': ''
+            })
+    
     if len(user_ids_valid) == 0:
         return []
     # 计算距离，床铺偏好特殊处理
@@ -159,13 +190,89 @@ def find_top3_matches(current_user_dict, current_hobbies, current_user_id, same_
             return 1
         else:
             return 2
-    bunk_weight = 2
+    
+    def sleep_overlap_score(sleep1, wake1, sleep2, wake2):
+        """计算睡眠时间重合度得分（线性计算）"""
+        try:
+            # 解析时间格式 "HH:MM"
+            def time_to_minutes(time_str):
+                if not time_str or ':' not in time_str:
+                    return 0
+                hours, minutes = map(int, time_str.split(':'))
+                return hours * 60 + minutes
+            
+            # 转换为分钟
+            sleep1_min = time_to_minutes(sleep1)
+            wake1_min = time_to_minutes(wake1)
+            sleep2_min = time_to_minutes(sleep2)
+            wake2_min = time_to_minutes(wake2)
+            
+            if sleep1_min == 0 or wake1_min == 0 or sleep2_min == 0 or wake2_min == 0:
+                return 0
+            
+            # 处理跨夜的情况
+            if sleep1_min > wake1_min:  # 跨夜
+                wake1_min += 24 * 60
+            if sleep2_min > wake2_min:  # 跨夜
+                wake2_min += 24 * 60
+            
+            # 计算重叠时间
+            overlap_start = max(sleep1_min, sleep2_min)
+            overlap_end = min(wake1_min, wake2_min)
+            
+            if overlap_end <= overlap_start:
+                return 0  # 没有重叠
+            
+            overlap_minutes = overlap_end - overlap_start
+            
+            # 计算总睡眠时长（以最早睡和最晚起为准）
+            earliest_sleep = min(sleep1_min, sleep2_min)
+            latest_wake = max(wake1_min, wake2_min)
+            total_sleep_duration = latest_wake - earliest_sleep
+            
+            # 计算重合度：重合时间占总睡眠时长的比例
+            overlap_percentage = overlap_minutes / total_sleep_duration if total_sleep_duration > 0 else 0
+            
+            return overlap_percentage
+            
+        except Exception as e:
+            print(f"睡眠时间计算错误: {e}")
+            return 0
+    
+    bunk_weight = 1
+    sleep_weight = 5  # 睡眠重合度权重（最高优先级）
     dists = []
     for i, emb in enumerate(X_valid):
         # 结构化+爱好距离
         dist = np.linalg.norm(current_full_emb - emb)
-        # 床铺距离
-        bunk_dist = bunk_distance(current_user_dict.get('bunk_preference'), user_bunks_valid[i])
-        dists.append(dist + bunk_weight * bunk_dist)
+        
+        # 床铺距离（特殊逻辑）
+        current_bunk = current_user_dict.get('bunk_preference', '')
+        other_bunk = user_details[i].get('bunk_preference', '')
+        
+        # 床铺匹配特殊逻辑
+        bunk_dist = 2  # 默认距离
+        if current_bunk == other_bunk:
+            bunk_dist = 1  # 相同偏好
+        elif (current_bunk == 'upper' and (other_bunk == 'lower' or other_bunk == '无')) or \
+             (other_bunk == 'upper' and (current_bunk == 'lower' or current_bunk == '无')):
+            bunk_dist = 0  # 上铺优先匹配下铺或无偏好
+        
+        # 睡眠重合度得分
+        current_sleep = current_user_dict.get('sleep_time', '')
+        current_wake = current_user_dict.get('wake_time', '')
+        other_sleep = user_details[i].get('sleep_time', '')
+        other_wake = user_details[i].get('wake_time', '')
+        sleep_score = sleep_overlap_score(current_sleep, current_wake, other_sleep, other_wake)
+        
+        # 重新设计匹配算法：睡眠重合度最重要
+        # 基础距离权重降低，睡眠重合度权重最高
+        base_weight = 1  # 降低基础特征权重
+        sleep_bonus = sleep_score * sleep_weight  # 睡眠重合度奖励（权重最高）
+        bunk_penalty = bunk_dist * bunk_weight   # 床铺不匹配惩罚
+        
+        # 总距离 = 基础距离 + 床铺惩罚 - 睡眠奖励
+        total_dist = base_weight * dist + bunk_penalty - sleep_bonus
+        dists.append(total_dist)
     top3_idx = np.argsort(dists)[:3]
     return user_ids_valid[top3_idx].tolist() 

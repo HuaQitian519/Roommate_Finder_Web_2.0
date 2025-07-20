@@ -29,8 +29,8 @@
         <div class="mb-3">
             <label for="gender" class="form-label">性别</label>
             <select id="gender" name="gender" class="form-control" required>
-                <option value="male" {% if user.gender == 'male' %}selected{% endif %}>男</option>
-                <option value="female" {% if user.gender == 'female' %}selected{% endif %}>女</option>
+                <option value="男" {% if user.gender == '男' %}selected{% endif %}>男</option>
+                <option value="女" {% if user.gender == '女' %}selected{% endif %}>女</option>
             </select>
         </div>
         <div class="mb-3">

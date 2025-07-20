@@ -8,8 +8,24 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./database/roommate.db:/app/database/roommate.db
+      - ./database:/app/database
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=production
-    restart: always 
+    restart: always
+    # 添加容器名称避免冲突
+    container_name: roommate_matcher_app
+    # 添加健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # 添加资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M 

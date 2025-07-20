@@ -36,6 +36,10 @@ def index():
     random_users = []
 
     if current_user.is_authenticated:
+        # 检查用户是否已审核
+        if not current_user.is_approved:
+            return render_template('incomplete_data.html', message="您的账号正在审核中，审核通过后才能查看其他用户信息。")
+        
         # 只获取与当前用户性别相同的用户（排除自己）
         from models import User
         same_gender_users = User.query.filter(
@@ -347,8 +351,10 @@ def login():
         login_user(user)
         # 登录后弹窗提示
         if user.auto_set_roommate:
-            flash('您因3天未登录已被自动标记为“已找到室友”，如仍未找到可再次点击打开。')
+            flash('您因3天未登录已被自动标记为"已找到室友"，如仍未找到可再次点击打开。')
             user.auto_set_roommate = False
+            # 重置has_found_roommate状态，让用户重新参与匹配
+            user.has_found_roommate = False
             db.session.commit()
         return redirect(url_for('index'))
 
@@ -399,6 +405,11 @@ def profile():
 @app.route('/match')
 @login_required
 def match():
+    # 检查用户是否已审核
+    if not current_user.is_approved:
+        flash('您的账号正在审核中，审核通过后才能使用智能匹配功能。')
+        return redirect(url_for('index'))
+        
     if current_user.has_found_roommate:
         flash('您已找到室友，不再参与匹配。')
         return redirect(url_for('index'))

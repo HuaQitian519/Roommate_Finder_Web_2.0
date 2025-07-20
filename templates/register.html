@@ -32,13 +32,21 @@
               <option value="视觉传达设计" {% if form_data and form_data.major == '视觉传达设计' %}selected{% endif %}>视觉传达设计</option>
             </select>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-12">
             <label class="form-label">作息时间</label>
-            <div class="input-group">
-              <span class="input-group-text">睡觉</span>
-              <input type="time" class="form-control" name="sleep_time" value="{{ form_data.sleep_time if form_data else '23:30' }}" required>
-              <span class="input-group-text">起床</span>
-              <input type="time" class="form-control" name="wake_time" value="{{ form_data.wake_time if form_data else '07:30' }}" required>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-text">睡觉时间</span>
+                  <input type="time" class="form-control" name="sleep_time" value="{{ form_data.sleep_time if form_data else '23:30' }}" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-text">起床时间</span>
+                  <input type="time" class="form-control" name="wake_time" value="{{ form_data.wake_time if form_data else '07:30' }}" required>
+                </div>
+              </div>
             </div>
           </div>
           <div class="col-md-6">

@@ -4,6 +4,9 @@ FROM python:3.9-slim
 # 设置工作目录
 WORKDIR /app
 
+# 安装curl用于健康检查
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # 复制项目的依赖文件
 COPY requirements.txt .
 
@@ -23,5 +26,8 @@ ENV FLASK_ENV=production
 # 暴露应用端口
 EXPOSE 8000
 
-# 启动时总是执行数据库初始化（包括管理员账号检查）
-CMD python database.py && gunicorn -w 4 -b 0.0.0.0:8000 app:app
+# 创建启动脚本
+RUN echo '#!/bin/bash\npython database.py\nexec gunicorn -w 4 -b 0.0.0.0:8000 app:app' > /app/start.sh && chmod +x /app/start.sh
+
+# 使用启动脚本
+CMD ["/app/start.sh"]
